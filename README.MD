@@ -24,6 +24,6 @@ copy({
 
 // Copy png Image
 copy({
-  'image/png':
+  'image/png': fetch(src).then(response => response.blob())
 })
 ```
