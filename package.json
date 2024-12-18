@@ -1,0 +1,19 @@
+{
+  "name": "modern-copy-to-clipboard",
+  "version": "0.1.0",
+  "description": "Copy text and multiple MIME-type data to clipboard",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "type": "module",
+  "keywords": [
+    "copy",
+    "clipboard",
+    "browser"
+  ],
+  "author": "LXYJEK <lxyjek@gmail.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jeeekxy/modern-copy-to-clipboard"
+  }
+}
