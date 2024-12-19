@@ -2,6 +2,6 @@ export {
   attachMetadataCopyContent,
   getMetadataCopyContent,
   extractMetadataCopyContent,
-} from './copyMetadata'
+} from './copyMetadata.js'
 
-export { default } from './copy'
+export { default } from './copy.js'

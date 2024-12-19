@@ -24,7 +24,7 @@ const execCopy = data => {
     }
   }
   try {
-    document.addEventListener('copy', onExecCopy)
+    document.addEventListener('copy', onExecCopy, true)
     const execCopySuccess = document.execCommand('copy')
     if (!execCopySuccess) {
       throw new Error('copy failed')
@@ -46,7 +46,7 @@ const asyncCopyData = (data, canFallback) => {
   try {
     const clipboardItemObj = {}
     for (const [format, value] of Object.entries(data)) {
-      if (value instanceof Blob) {
+      if (value instanceof Blob || value instanceof Promise) {
         clipboardItemObj[format] = value
       } else {
         clipboardItemObj[format] = new Blob([value], { type: format })

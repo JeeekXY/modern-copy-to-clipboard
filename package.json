@@ -1,6 +1,6 @@
 {
   "name": "modern-copy-to-clipboard",
-  "version": "0.1.0",
+  "version": "0.1.2",
   "description": "Copy text and multiple MIME-type data to clipboard",
   "main": "index.js",
   "types": "index.d.ts",
@@ -8,7 +8,8 @@
   "keywords": [
     "copy",
     "clipboard",
-    "browser"
+    "browser",
+    "vanilla"
   ],
   "author": "LXYJEK <lxyjek@gmail.com>",
   "license": "MIT",
