@@ -30,7 +30,7 @@ const execCopy = data => {
       throw new Error('copy failed')
     }
   } finally {
-    document.removeEventListener('copy', onExecCopy)
+    document.removeEventListener('copy', onExecCopy, true)
   }
 }
 

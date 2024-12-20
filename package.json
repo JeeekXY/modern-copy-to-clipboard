@@ -1,6 +1,6 @@
 {
   "name": "modern-copy-to-clipboard",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Copy text and multiple MIME-type data to clipboard",
   "main": "index.js",
   "types": "index.d.ts",
