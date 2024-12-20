@@ -27,7 +27,7 @@ const execCopy = data => {
     document.addEventListener('copy', onExecCopy, true)
     const execCopySuccess = document.execCommand('copy')
     if (!execCopySuccess) {
-      throw new Error('copy failed')
+      throw new Error('Copy failed')
     }
   } finally {
     document.removeEventListener('copy', onExecCopy, true)
