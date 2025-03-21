@@ -16,5 +16,8 @@
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jeeekxy/modern-copy-to-clipboard"
+  },
+  "devDependencies": {
+    "prettier": "^3.5.3"
   }
 }

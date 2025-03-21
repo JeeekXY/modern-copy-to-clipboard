@@ -15,5 +15,5 @@ export interface CopyData {
   [format: string]: string | Blob | Promise<Blob>
 }
 
-declare function copy(value: string | CopyData): Promise<void>
+declare function copy(value: string | Promise<string> | CopyData): Promise<void>
 export default copy

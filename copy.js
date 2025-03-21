@@ -1,99 +1,113 @@
-const PlainTextFormat = 'text/plain'
-const HtmlFormat = 'text/html'
-const PngFormat = 'image/png'
-
-const defaultAsyncFormatSet = new Set([PlainTextFormat, HtmlFormat, PngFormat])
-const asyncCopySupport = !!(window.isSecureContext && navigator.clipboard)
-const asyncCopyTextSupport = !!(asyncCopySupport && navigator.clipboard.writeText)
-const asyncCopyDataSupport = !!(asyncCopySupport && navigator.clipboard.write)
-
-const execCopySupport = !!document.execCommand
-
-const asyncFormatsSupport = formats => {
-  if (ClipboardItem && ClipboardItem.supports) {
-    return formats.every(format => ClipboardItem.supports(format))
-  }
-  return formats.every(format => defaultAsyncFormatSet.has(format))
+const FORMATS = {
+  TEXT: 'text/plain',
+  HTML: 'text/html',
+  PNG: 'image/png',
 }
 
-const execCopy = data => {
-  const onExecCopy = event => {
-    event.preventDefault()
-    for (const [format, value] of Object.entries(data)) {
-      event.clipboardData.setData(format, value)
+const SUPPORTED_FORMATS = new Set([FORMATS.TEXT, FORMATS.HTML, FORMATS.PNG])
+
+const asyncClipboard = window.isSecureContext && navigator?.clipboard
+const FEATURES = {
+  asyncCopyText: !!asyncClipboard?.writeText,
+  asyncCopyData: !!asyncClipboard?.write,
+  syncCopy: !!document?.execCommand,
+}
+
+const syncCopy = data => {
+  return new Promise((resolve, reject) => {
+    const onExecCopy = event => {
+      event.preventDefault()
+      Object.entries(data).forEach(([format, value]) => {
+        event.clipboardData.setData(format, value)
+      })
+      resolve()
+    }
+    try {
+      document.addEventListener('copy', onExecCopy, true)
+      document.execCommand('copy')
+      throw new Error('Copy command failed')
+    } catch (error) {
+      reject(error)
+    } finally {
+      document.removeEventListener('copy', onExecCopy, true)
+    }
+  })
+}
+
+export const copyText = async text => {
+  if (FEATURES.asyncCopyText) {
+    try {
+      return navigator.clipboard.writeText(text)
+    } catch {
+      // Do nothing
     }
   }
-  try {
-    document.addEventListener('copy', onExecCopy, true)
-    const execCopySuccess = document.execCommand('copy')
-    if (!execCopySuccess) {
-      throw new Error('Copy failed')
+  if (FEATURES.execCopy) {
+    try {
+      return syncCopy({ [FORMATS.TEXT]: text })
+    } catch {
+      // Do nothing
     }
-  } finally {
-    document.removeEventListener('copy', onExecCopy, true)
   }
+  throw new Error('Copy operation not supported in this environment')
 }
 
-const asyncCopyText = text => {
-  try {
-    return navigator.clipboard.writeText(text)
-  } catch {
-    return execCopy({ PlainTextFormat: text })
+const checkAsyncFormatSupport = format => {
+  if (ClipboardItem?.supports) {
+    return ClipboardItem.supports(format)
   }
+  return SUPPORTED_FORMATS.has(format)
 }
 
-const asyncCopyData = (data, canFallback) => {
-  try {
-    const clipboardItemObj = {}
-    for (const [format, value] of Object.entries(data)) {
-      if (value instanceof Blob || value instanceof Promise) {
-        clipboardItemObj[format] = value
-      } else {
-        clipboardItemObj[format] = new Blob([value], { type: format })
+export const copyData = async data => {
+  const dataEntries = Object.entries(data)
+  if (dataEntries.length === 1 && dataEntries[0][0] === FORMATS.TEXT) {
+    return copyText(`${dataEntries[0][1]}`)
+  }
+  let asyncCopyEnabled = true
+  let syncCopyEnabled = true
+  for (const [format, value] of dataEntries) {
+    if (value instanceof Blob || value instanceof Promise) {
+      syncCopyEnabled = false
+    }
+    if (!checkAsyncFormatSupport(format)) {
+      asyncCopyEnabled = false
+    }
+  }
+  if (FEATURES.asyncCopyData && asyncCopyEnabled) {
+    try {
+      const clipboardItemObj = {}
+      for (const [format, value] of Object.entries(data)) {
+        if (value instanceof Blob || value instanceof Promise) {
+          clipboardItemObj[format] = value
+        } else {
+          clipboardItemObj[format] = new Blob([value], { type: format })
+        }
       }
+      return await navigator.clipboard.write([new ClipboardItem(clipboardItemObj)])
+    } catch {
+      // Do nothing
     }
-    return navigator.clipboard.write([new ClipboardItem(clipboardItemObj)])
-  } catch (error) {
-    if (canFallback) {
-      return execCopy(data)
+  }
+  if (FEATURES.execCopy && syncCopyEnabled) {
+    try {
+      return syncCopy(data)
+    } catch {
+      // Do nothing
     }
-    throw error
   }
-}
-
-export const copyText = text => {
-  if (asyncCopyTextSupport) {
-    return asyncCopyText(text)
-  }
-  if (execCopySupport) {
-    return execCopy({ PlainTextFormat: text })
-  }
-  throw new Error('Copy failed')
-}
-
-export const copyData = data => {
-  const formats = Object.keys(data)
-  if (formats.length === 1 && formats[0] === PlainTextFormat) {
-    return copyText(data[PlainTextFormat])
-  }
-  const canFallback = Object.values(data).every(item => typeof item === 'string')
-  if (asyncCopyDataSupport && asyncFormatsSupport(formats)) {
-    return asyncCopyData(data, canFallback)
-  }
-  if (canFallback && execCopySupport) {
-    return execCopy(data)
-  }
-  throw new Error('Copy failed')
+  throw new Error('Copy operation not supported for the given data format')
 }
 
 const copy = async value => {
-  if (typeof value === 'object' && value !== null) {
+  const valueType = typeof value
+  if (valueType === 'object' && value !== null) {
     return copyData(value)
   }
-  if(typeof value === 'string') {
-    return copyText(value)
+  if (valueType !== 'undefined') {
+    return copyText(`${value}`)
   }
-  throw new Error('Unsupported value type')
+  throw new Error('Unsupported value type for copy operation')
 }
 
 export default copy
