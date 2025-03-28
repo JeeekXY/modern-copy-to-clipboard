@@ -1,9 +1,10 @@
 {
   "name": "modern-copy-to-clipboard",
-  "version": "0.1.4",
+  "version": "1.0.0",
   "description": "Copy text and multiple MIME-type data to clipboard",
-  "main": "index.js",
-  "types": "index.d.ts",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts",
+  "unpkg": "dist/index.min.mjs",
   "type": "module",
   "keywords": [
     "copy",
@@ -11,13 +12,33 @@
     "browser",
     "vanilla"
   ],
-  "author": "LXYJEK <lxyjek@gmail.com>",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/jeeekxy/modern-copy-to-clipboard"
   },
+  "files": [
+    "dist"
+  ],
   "devDependencies": {
-    "prettier": "^3.5.3"
+    "@playwright/test": "^1.51.1",
+    "eslint": "^8.57.1",
+    "eslint-config-airbnb": "^19.0.4",
+    "eslint-config-prettier": "^10.1.1",
+    "eslint-plugin-import": "^2.25.3",
+    "eslint-plugin-jsx-a11y": "^6.5.1",
+    "eslint-plugin-react": "^7.28.0",
+    "eslint-plugin-react-hooks": "^4.3.0",
+    "http-server": "^14.1.1",
+    "prettier": "^3.5.3",
+    "prettier-eslint": "^16.3.0",
+    "unbuild": "^3.5.0"
+  },
+  "scripts": {
+    "build": "unbuild",
+    "publish": "unbuild && npm publish",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "demo": "http-server -p 0 -c-1 -o /demo"
   }
 }
