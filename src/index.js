@@ -13,11 +13,8 @@ const checkAsyncClipboardSupport = () => {
   }
 }
 
-const syncCopy = data => {
-  if (!document.execCommand) {
-    throw new Error('"execCommand" is not supported')
-  }
-  return new Promise((resolve, reject) => {
+const syncCopy = data =>
+  new Promise((resolve, reject) => {
     const onCopy = event => {
       event.preventDefault()
       event.stopPropagation()
@@ -32,20 +29,15 @@ const syncCopy = data => {
     }
 
     try {
-      document.addEventListener('copy', onCopy, true)
-      const execSuccess = document.execCommand('copy')
-      if (!execSuccess) {
-        throw new Error('Failed to trigger copy event')
-      } else {
-        throw new Error('Failed to capture copy event')
-      }
+      document.addEventListener('copy', onCopy, { capture: true })
+      document.execCommand('copy')
+      throw new Error('Failed when executing copy command')
     } catch (error) {
       reject(error)
     } finally {
-      document.removeEventListener('copy', onCopy, true)
+      document.removeEventListener('copy', onCopy, { capture: true })
     }
   })
-}
 
 const copyText = text => {
   const errorMsgs = []
@@ -66,7 +58,7 @@ const copyText = text => {
     errorMsgs.push(`Sync copy failed: ${e.message}`)
   }
 
-  throw new Error(['Failed to copy text', ...errorMsgs].join('\n'))
+  throw new Error(['Copy failed: ', ...errorMsgs].join('\n'))
 }
 
 let SUPPORTED_MIME_TYPES

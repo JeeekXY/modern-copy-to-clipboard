@@ -15,8 +15,6 @@ A modern clipboard copy utility that supports copying text, HTML, images, and cu
 
 ```bash
 npm install modern-copy-to-clipboard
-# or
-yarn add modern-copy-to-clipboard
 ```
 
 ## Usage
@@ -57,7 +55,6 @@ Copy data to clipboard.
 - `data`: Can be one of the following types:
   - `string`: Direct text to copy
   - `object`: Object containing different MIME-type data
-  - `Promise`: Asynchronous data (like Blob)
 
 #### Returns
 
